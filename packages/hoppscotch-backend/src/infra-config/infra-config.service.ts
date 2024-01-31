@@ -21,7 +21,6 @@ import {
   throwErr,
   validateSMTPEmail,
   validateSMTPUrl,
-  validateSSOScope,
   validateUrl,
 } from 'src/utils';
 import { ConfigService } from '@nestjs/config';
@@ -98,6 +97,10 @@ export class InfraConfigService implements OnModuleInit {
       {
         name: InfraConfigEnum.MICROSOFT_SCOPE,
         value: process.env.MICROSOFT_SCOPE,
+      },
+      {
+        name: InfraConfigEnum.MICROSOFT_TENANT,
+        value: process.env.MICROSOFT_TENANT,
       },
       {
         name: InfraConfigEnum.VITE_ALLOWED_AUTH_PROVIDERS,
@@ -257,7 +260,8 @@ export class InfraConfigService implements OnModuleInit {
           configMap.MICROSOFT_CLIENT_ID &&
           configMap.MICROSOFT_CLIENT_SECRET &&
           configMap.MICROSOFT_CALLBACK_URL &&
-          configMap.MICROSOFT_SCOPE
+          configMap.MICROSOFT_SCOPE &&
+          configMap.MICROSOFT_TENANT
         );
       case AuthProvider.EMAIL:
         return configMap.MAILER_SMTP_URL && configMap.MAILER_ADDRESS_FROM;
@@ -406,8 +410,7 @@ export class InfraConfigService implements OnModuleInit {
             return E.left(INFRA_CONFIG_INVALID_INPUT);
           break;
         case InfraConfigEnumForClient.GOOGLE_SCOPE:
-          if (!validateSSOScope(infraConfigs[i].value))
-            return E.left(INFRA_CONFIG_INVALID_INPUT);
+          if (!infraConfigs[i].value) return E.left(INFRA_CONFIG_INVALID_INPUT);
           break;
         case InfraConfigEnumForClient.GITHUB_CLIENT_ID:
           if (!infraConfigs[i].value) return E.left(INFRA_CONFIG_INVALID_INPUT);
@@ -420,8 +423,7 @@ export class InfraConfigService implements OnModuleInit {
             return E.left(INFRA_CONFIG_INVALID_INPUT);
           break;
         case InfraConfigEnumForClient.GITHUB_SCOPE:
-          if (!validateSSOScope(infraConfigs[i].value))
-            return E.left(INFRA_CONFIG_INVALID_INPUT);
+          if (!infraConfigs[i].value) return E.left(INFRA_CONFIG_INVALID_INPUT);
           break;
         case InfraConfigEnumForClient.MICROSOFT_CLIENT_ID:
           if (!infraConfigs[i].value) return E.left(INFRA_CONFIG_INVALID_INPUT);
@@ -434,8 +436,10 @@ export class InfraConfigService implements OnModuleInit {
             return E.left(INFRA_CONFIG_INVALID_INPUT);
           break;
         case InfraConfigEnumForClient.MICROSOFT_SCOPE:
-          if (!validateSSOScope(infraConfigs[i].value))
-            return E.left(INFRA_CONFIG_INVALID_INPUT);
+          if (!infraConfigs[i].value) return E.left(INFRA_CONFIG_INVALID_INPUT);
+          break;
+        case InfraConfigEnumForClient.MICROSOFT_TENANT:
+          if (!infraConfigs[i].value) return E.left(INFRA_CONFIG_INVALID_INPUT);
           break;
         default:
           break;
