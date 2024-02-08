@@ -149,18 +149,20 @@ export function getDefaultInfraConfigs(): {
 export async function isInfraConfigTablePopulated(): Promise<boolean> {
   const prisma = new PrismaService();
   try {
-    const infraConfigCountInDB = await prisma.infraConfig.count();
-    const infraConfigCountShouldBe = getDefaultInfraConfigs().length;
+    const dbInfraConfigs = await prisma.infraConfig.findMany();
+    const infraConfigDefaultObjs = getDefaultInfraConfigs();
 
-    const isPopulated = infraConfigCountInDB === infraConfigCountShouldBe;
+    const propsRemainingToInsert = infraConfigDefaultObjs.filter(
+      (p) => !dbInfraConfigs.find((e) => e.name === p.name),
+    );
 
-    if (!isPopulated) {
+    if (propsRemainingToInsert.length > 0) {
       console.log(
         'Infra Config table is not populated with all entries. Populating now...',
       );
     }
 
-    return isPopulated;
+    return true;
   } catch (error) {
     return false;
   }
